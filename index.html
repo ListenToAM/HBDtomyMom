@@ -89,6 +89,28 @@
             margin-bottom: 20px;
         }
 
+        /* รูปที่ลอยขึ้นมาจากด้านล่างตอนกดปิด */
+        .floater {
+            position: fixed;
+            bottom: -200px;
+            width: var(--s);
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            border: 3px solid #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            animation: floatUp 3s cubic-bezier(0.25, 0.6, 0.45, 1) both;
+        }
+
+        @keyframes floatUp {
+            0%   { opacity: 0; transform: translate(0, 0) rotate(var(--r0)) scale(0.5); }
+            12%  { opacity: 1; }
+            100% { opacity: 1; transform: translate(var(--sway), calc(-100vh - 420px)) rotate(var(--r1)) scale(1); }
+        }
+
         .extra-note {
             font-size: 18px;
             color: #ff4757;
@@ -124,14 +146,41 @@
         <div class="date-label" id="dateDisplay">วันที่ -</div>
         <div class="msg-text" id="msgDisplay">กำลังโหลดข้อความ...</div>
         <div class="extra-note" id="extraNote"></div>
-        <button class="close-btn" onclick="closeApp()">จำได้แล้ว ปิดหน้านี้จ้า</button>
-        <div class="footer-credit">จากลูกคนโปรด ที่ปากแข็งนิดหน่อย ❤️</div>
+        <button class="close-btn" onclick="closeApp()">ปิดหน้านี้</button>
     </div>
 
     <!-- ข้อความทั้งหมดอยู่ในไฟล์นี้ -->
     <script src="messages.js"></script>
     <script>
         const DEFAULT_ICON = "💌";
+
+        // รูปที่จะลอยขึ้นตอนกดปิด (เพิ่มรูปใหม่ต่อท้ายได้เลย)
+        // pos = ตำแหน่งครอปรูป เช่น "center 20%" ถ้าหน้าคนโดนตัด
+        const PHOTOS = [
+            { src: "photo1.jpg", pos: "center 20%" },
+            { src: "photo2.jpg", pos: "center" }
+        ];
+
+        // ปล่อยรูปลอยขึ้นจากด้านล่าง พ้นจอแล้วลบทิ้งเอง
+        function floatPhotos(count = 28) {
+            const rand = (a, b) => a + Math.random() * (b - a);
+            for (let i = 0; i < count; i++) {
+                const photo = PHOTOS[Math.floor(Math.random() * PHOTOS.length)];
+                const el = document.createElement("img");
+                el.src = photo.src;
+                el.className = "floater";
+                el.style.objectPosition = photo.pos;
+                el.style.left = rand(2, 75) + "%";
+                el.style.animationDuration = rand(2.4, 4) + "s";
+                el.style.animationDelay = rand(0, 1.4) + "s";
+                el.style.setProperty("--s", rand(56, 110) + "px");
+                el.style.setProperty("--sway", rand(-80, 80) + "px");
+                el.style.setProperty("--r0", rand(-25, 25) + "deg");
+                el.style.setProperty("--r1", rand(-25, 25) + "deg");
+                el.addEventListener("animationend", () => el.remove());
+                document.body.appendChild(el);
+            }
+        }
 
         function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -176,6 +225,9 @@
                 year: "numeric", month: "long", day: "numeric", weekday: "long"
             });
 
+            // โหลดรูปรอไว้ก่อน จะได้ขึ้นทันทีตอนกดปิด
+            PHOTOS.forEach((p) => { new Image().src = p.src; });
+
             const msg = pickMessage(now);
             document.getElementById("cardIcon").innerText = msg.icon;
             document.getElementById("msgDisplay").innerText = msg.text;
@@ -189,11 +241,13 @@
             if (state.count > 1) {
                 const note = document.getElementById("extraNote");
                 note.style.display = "block";
-                note.innerText = `กดเข้ามาดูรอบที่ ${state.count} แล้วนะ... คิดถึงลูกชายคนนี้ล่ะสิ 😉`;
+                note.innerText = `กดเข้ามาดูรอบที่ ${state.count} แล้วนะ... คิดถึงลูกหรอ 😉`;
             }
         }
 
         function closeApp() {
+            floatPhotos();
+
             const card = document.querySelector(".popup-card");
             card.style.transition = "transform 0.4s ease, opacity 0.4s ease";
             card.style.transform = "scale(0.5)";

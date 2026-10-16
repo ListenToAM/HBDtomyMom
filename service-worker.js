@@ -1,5 +1,5 @@
 // ถ้าแก้ไฟล์แล้วอยากบังคับให้เครื่องแม่โหลดใหม่ทั้งหมด ให้เปลี่ยนเลขเวอร์ชันตรงนี้
-const CACHE = "mom-app-v2";
+const CACHE = "mom-app-v3";
 
 const FILES = [
   "./",
@@ -9,7 +9,9 @@ const FILES = [
   "FCVision.otf",
   "icon-180.png",
   "icon-192.png",
-  "icon-512.png"
+  "icon-512.png",
+  "photo1.jpg",
+  "photo2.jpg"
 ];
 
 self.addEventListener("install", (event) => {
