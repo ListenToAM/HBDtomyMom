@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- ตั้งค่าให้เวลาแม่ Add to Home Screen แล้วเปิดเต็มจอ ไม่มีแถบ Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>พื้นที่ของแม่ ❤️</title>
+    
+    <style>
+        /* นำเข้าฟอนต์ FC Bluewhale */
+        @font-face {
+            font-family: 'FC Bluewhale';
+            src: url('FC Bluewhale [Non-commercial].ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'FC Bluewhale', sans-serif; /* เรียกใช้ฟอนต์ FC Bluewhale */
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* เปลี่ยนพื้นหลังเป็นสีเทาตามที่ต้องการ */
+            background-color: #8c8c8c;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* กล่อง Modal เบลอหลัง (Glassmorphism) เด้งขึ้นมาทันทีที่เปิดแอป */
+        .popup-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            width: 100%;
+            max-width: 380px;
+            padding: 35px 25px;
+            border-radius: 28px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform: scale(0.7);
+            opacity: 0;
+        }
+
+        @keyframes popIn {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .icon-header {
+            font-size: 42px;
+            margin-bottom: 12px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
+        }
+
+        .date-label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .msg-text {
+            font-size: 26px; /* ปรับขนาดฟอนต์ให้ใหญ่ขึ้นนิดนึง เพราะฟอนต์สไตล์นี้ตัวอาจจะเล็กกว่าปกติ */
+            color: #2f3542;
+            line-height: 1.5;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* ข้อความแซวเวลาแม่กดซ้ำในวันเดิม */
+        .extra-note {
+            font-size: 18px;
+            color: #ff4757;
+            margin-bottom: 15px;
+            background: rgba(255, 71, 87, 0.1);
+            padding: 8px 12px;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .close-btn {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            font-size: 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.3);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .close-btn:active {
+            transform: scale(0.96);
+        }
+
+        .footer-credit {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="popup-card">
+        <div class="icon-header" id="cardIcon">💌</div>
+        <div class="date-label" id="dateDisplay">วันที่ -</div>
+        <div class="msg-text" id="msgDisplay">กำลังโหลดข้อความ...</div>
+        <div class="extra-note" id="extraNote"></div>
+        <button class="close-btn" onclick="closeApp()">จำได้แล้ว ปิดหน้านี้จ้า</button>
+        <div class="footer-credit">จากลูกคนโปรด ที่ปากแข็งนิดหน่อย ❤️</div>
+    </div>
+
+    <script>
+        // ชุดประโยค (ตัดวงเล็บออกทั้งหมดแล้ว)
+        const allMessages = [
+            "ตื่นมาขอให้วันนี้เป็นวันที่ยิ้มได้เยอะๆ นะแม่ มีอะไรเหนื่อยบอกได้ ถึงบ่นแต่ก็ห่วง",
+            "กินข้าวให้อิ่ม นอนหลับให้สนิท อย่าห่วงแต่คนอื่นจนลืมดูแลตัวเองนะแม่",
+            "วันนี้อากาศเปลี่ยน ดูแลสุขภาพด้วยนะ เป็นห่วงแต่พูดไม่ค่อยเก่ง",
+            "ขอบคุณที่คอยซัพพอร์ตกันตลอด ถึงลูกจะกวนประสาทไปบ้างก็รักแม่นะ",
+            "เหนื่อยก็พักบ้างนะแม่ ลูกคนนี้อยากเห็นแม่ยิ้มเยอะๆ",
+            "เงินในบัญชีแม่พอใช้มั้ย ลูกโอนไปช่วยเพิ่มได้นะ แอบกระซิบ",
+            "ไม่ว่าจะเจอเรื่องอะไรหนักๆ วันนี้ขอให้ผ่านไปได้ราบรื่นนะแม่",
+            "รักแม่นะ แต่ให้บอกรักตรงๆ มันเขิน เอาเป็นว่าอ่านประโยคนี้แทนละกัน",
+            "ไม่ว่าลูกจะโตแค่ไหน ข้าวที่แม่ทำก็อร่อยที่สุดในโลกเสมอ",
+            "วันนี้ขอให้เป็นวันที่โชคดี มีแต่เรื่องดีๆ เข้ามาหาแม่นะ"
+        ];
+
+        function initApp() {
+            const todayStr = new Date().toDateString(); 
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('th-TH', options);
+
+            let savedData = JSON.parse(localStorage.getItem('mom_app_data')) || { lastDate: "", index: -1, clickCount: 0 };
+
+            let msgIndex;
+            let isSameDay = (savedData.lastDate === todayStr);
+
+            if (isSameDay) {
+                msgIndex = savedData.index;
+                savedData.clickCount += 1;
+
+                if (savedData.clickCount > 1) {
+                    const note = document.getElementById('extraNote');
+                    note.style.display = 'block';
+                    note.innerText = `กดเข้ามาดูรอบที่ ${savedData.clickCount} แล้วนะ... คิดถึงลูกชายคนนี้ล่ะสิ 😉`;
+                }
+            } else {
+                msgIndex = (savedData.index + 1) % allMessages.length;
+                savedData.lastDate = todayStr;
+                savedData.index = msgIndex;
+                savedData.clickCount = 1;
+            }
+
+            localStorage.setItem('mom_app_data', JSON.stringify(savedData));
+            document.getElementById('msgDisplay').innerText = allMessages[msgIndex];
+        }
+
+        function closeApp() {
+            const card = document.querySelector('.popup-card');
+            card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+            card.style.transform = 'scale(0.5)';
+            card.style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('msgDisplay').innerText = "ขอให้วันนี้มีความสุขมากๆ นะแม่ ไว้พรุ่งนี้มาเปิดอ่านใหม่ ❤️";
+                document.getElementById('extraNote').style.display = 'none';
+                document.querySelector('.close-btn').style.display = 'none';
+                document.getElementById('cardIcon').innerText = "✨";
+                
+                card.style.transform = 'scale(1)';
+                card.style.opacity = '1';
+            }, 400);
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
