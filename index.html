@@ -8,7 +8,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ของแม่">
-    <meta name="theme-color" content="#8c8c8c">
+    <meta name="theme-color" content="#24504C">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-180.png">
     <title>พื้นที่ของแม่ ❤️</title>
@@ -31,28 +31,36 @@
 
         html, body { height: 100%; }
 
+        /* โต๊ะสีเขียวเข้ม + จดหมายกระดาษวางอยู่ */
         body {
-            background-color: #8c8c8c;
+            background-color: #24504C;
             min-height: 100vh;
             min-height: 100dvh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
-            padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
         }
 
-        .popup-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            width: 100%;
-            max-width: 380px;
-            padding: 35px 25px;
-            border-radius: 28px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        .screen {
+            height: 100vh;
+            height: 100dvh;
+            max-width: 430px;
+            margin: 0 auto;
+            padding: max(56px, env(safe-area-inset-top)) 28px max(32px, env(safe-area-inset-bottom));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .date-label { font-size: 17px; color: #E9F1EE; letter-spacing: 0.04em; }
+
+        .paper-wrap { width: 100%; transform: rotate(-1.5deg); }
+
+        .paper {
+            position: relative;
+            background: #FBF6EC;
+            border-radius: 6px;
+            padding: 42px 26px 28px;
+            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.28);
             animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             transform: scale(0.7);
             opacity: 0;
@@ -60,33 +68,73 @@
 
         @keyframes popIn { to { transform: scale(1); opacity: 1; } }
 
-        .icon-header {
-            font-size: 42px;
-            margin-bottom: 12px;
-            animation: bounce 2s infinite;
+        /* เทปแปะกระดาษ */
+        .tape {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            width: 88px;
+            height: 28px;
+            margin-left: -44px;
+            background: rgba(216, 87, 60, 0.6);
+            transform: rotate(3deg);
         }
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-8px); }
-            60% { transform: translateY(-4px); }
+        .paper-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            .icon-header { animation: none; }
-        }
-
-        .date-label { font-size: 16px; color: #666; margin-bottom: 8px; }
+        .to-mom { font-size: 20px; color: #8A4B3A; }
+        .icon-header { font-size: 26px; }
 
         .msg-text {
-            font-size: 24px;
-            color: #2f3542;
+            font-size: 26px;
+            color: #2B2622;
             line-height: 1.5;
             min-height: 90px;
+        }
+
+        .signature {
+            margin-top: 22px;
             display: flex;
+            justify-content: flex-end;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
+            gap: 8px;
+            color: #B8412A;
+            font-size: 22px;
+        }
+
+        .extra-note {
+            font-size: 17px;
+            color: #B8412A;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 2px dashed #E3D6C0;
+            display: none;
+        }
+
+        .close-btn {
+            background: #B8412A;
+            color: #fff;
+            border: none;
+            width: 100%;
+            height: 56px;
+            font-size: 22px;
+            border-radius: 28px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s;
+        }
+
+        .close-btn:active { transform: scale(0.96); }
+
+        /* จอเตี้ยๆ (เช่น iPhone SE) ลดขนาดตัวอักษรให้พอดี */
+        @media (max-height: 700px) {
+            .msg-text { font-size: 21px; min-height: 60px; }
+            .screen { padding-top: max(36px, env(safe-area-inset-top)); }
         }
 
         /* รูปที่ลอยขึ้นมาจากด้านล่างตอนกดปิด */
@@ -110,43 +158,29 @@
             12%  { opacity: 1; }
             100% { opacity: 1; transform: translate(var(--sway), calc(-100vh - 420px)) rotate(var(--r1)) scale(1); }
         }
-
-        .extra-note {
-            font-size: 18px;
-            color: #ff4757;
-            margin-bottom: 15px;
-            background: rgba(255, 71, 87, 0.1);
-            padding: 8px 12px;
-            border-radius: 12px;
-            display: none;
-        }
-
-        .close-btn {
-            background: linear-gradient(135deg, #ff4757, #ff6b81);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            font-size: 20px;
-            border-radius: 16px;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.3);
-            transition: transform 0.2s, opacity 0.2s;
-        }
-
-        .close-btn:active { transform: scale(0.96); }
-
-        .footer-credit { margin-top: 15px; font-size: 14px; color: #888; }
     </style>
 </head>
 <body>
 
-    <div class="popup-card">
-        <div class="icon-header" id="cardIcon">💌</div>
+    <div class="screen">
         <div class="date-label" id="dateDisplay">วันที่ -</div>
-        <div class="msg-text" id="msgDisplay">กำลังโหลดข้อความ...</div>
-        <div class="extra-note" id="extraNote"></div>
-        <button class="close-btn" onclick="closeApp()">ปิดหน้านี้</button>
+
+        <div class="paper-wrap">
+            <div class="paper">
+                <div class="tape"></div>
+                <div class="paper-head">
+                    <div class="to-mom">ถึงแม่</div>
+                    <div class="icon-header" id="cardIcon">💌</div>
+                </div>
+                <div class="msg-text" id="msgDisplay">กำลังโหลดข้อความ...</div>
+                <div class="signature">จากลูก
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#B8412A" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div class="extra-note" id="extraNote"></div>
+            </div>
+        </div>
+
+        <button class="close-btn" id="closeBtn" onclick="closeApp()">ปิดหน้านี้</button>
     </div>
 
     <!-- ข้อความทั้งหมดอยู่ในไฟล์นี้ -->
@@ -248,19 +282,19 @@
         function closeApp() {
             floatPhotos();
 
-            const card = document.querySelector(".popup-card");
-            card.style.transition = "transform 0.4s ease, opacity 0.4s ease";
-            card.style.transform = "scale(0.5)";
-            card.style.opacity = "0";
+            const paper = document.querySelector(".paper");
+            paper.style.transition = "transform 0.4s ease, opacity 0.4s ease";
+            paper.style.transform = "scale(0.5)";
+            paper.style.opacity = "0";
 
             setTimeout(() => {
                 document.getElementById("msgDisplay").innerText = "ขอให้วันนี้มีความสุขมากๆ นะแม่ ไว้พรุ่งนี้มาเปิดอ่านใหม่ ❤️";
                 document.getElementById("extraNote").style.display = "none";
-                document.querySelector(".close-btn").style.display = "none";
+                document.getElementById("closeBtn").style.visibility = "hidden";
                 document.getElementById("cardIcon").innerText = "✨";
 
-                card.style.transform = "scale(1)";
-                card.style.opacity = "1";
+                paper.style.transform = "scale(1)";
+                paper.style.opacity = "1";
             }, 400);
         }
 
